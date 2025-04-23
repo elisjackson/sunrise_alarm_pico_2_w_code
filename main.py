@@ -1,4 +1,4 @@
-from leds import sunrise_led, main_led
+from leds import sunrise_led #, main_led
 from brightness_control import brightness_control
 from server import HTTPServer
 import logging
@@ -45,7 +45,7 @@ async def main():
     uasyncio.create_task(log_exceptions(logging.write_memory_to_log(server), server))
     uasyncio.create_task(log_exceptions(brightness_control.handle_button(), server))
     uasyncio.create_task(log_exceptions(sunrise_led.handle_button(), server))
-    uasyncio.create_task(log_exceptions(main_led.handle_button(), server))
+    # uasyncio.create_task(log_exceptions(main_led.handle_button(), server))
     
     while True:
         await uasyncio.sleep(0.01)

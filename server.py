@@ -7,7 +7,7 @@ import sys
 import uasyncio
 from index import webpage
 from brightness_control import brightness_control
-from leds import sunrise_led, main_led
+from leds import sunrise_led #, main_led
 
 
 class HTTPServer:
@@ -102,20 +102,21 @@ class HTTPServer:
                 
                 print("Request arguments:", arguments)
                 
-                brightness, alarm_time, sunrise_led_mode, main_led_mode = arguments
+                # brightness, alarm_time, sunrise_led_mode, main_led_mode = arguments
+                brightness, alarm_time, sunrise_led_mode = arguments
                 
                 # process brightness; convert % str to decimal
                 brightness_control.brightness = int(brightness) / 100
                 
                 # process & handle LED mode arguments
                 sunrise_led_mode = sunrise_led_mode.lower()
-                main_led_mode = main_led_mode.lower()
+                # main_led_mode = main_led_mode.lower()
                 
                 if sunrise_led_mode == "alarm":
                     sunrise_led_mode = "sunrise_alarm"
                     
                 await sunrise_led.handle_server_mode_control(sunrise_led_mode)
-                await main_led.handle_server_mode_control(main_led_mode)
+                # await main_led.handle_server_mode_control(main_led_mode)
                 
                 # process time
                 alarm_hour = int(alarm_time.split("%3A")[0])
@@ -129,7 +130,7 @@ class HTTPServer:
             int(100 * brightness_control.brightness),
             sunrise_led.alarm_time,
             sunrise_led.mode,
-            main_led.mode
+            # main_led.mode
             )
 
         # Send HTTP response
