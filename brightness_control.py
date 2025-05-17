@@ -58,4 +58,4 @@ class BrightnessControl:
             self.event.clear()
 
 
-brightness_control = BrightnessControl(pin=22)
+brightness_control = BrightnessControl(pin=3)

@@ -117,10 +117,6 @@ def webpage(
             <br>
         </form>
         
-        <form action="/" method="POST">
-            <button name="time" value="settime">Set RTC</button>
-        </form>
-        
     </body>
     </html>
     """

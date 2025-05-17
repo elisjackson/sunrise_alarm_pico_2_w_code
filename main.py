@@ -4,7 +4,7 @@ from server import HTTPServer
 import logging
 import uasyncio
 import json
-import time
+import os
 
 
 async def log_exceptions(awaitable, s):
@@ -21,25 +21,20 @@ async def main():
     led.value(True)
     
     print("Running main")
-    
-    # TODO - error handle this. Check it exists.
-    # If not - don't run server.
-    with open("secrets.json") as f:
-        secrets = json.load(f)
+
+    # Check if the file exists before opening
+    if "secrets.json" in os.listdir():
+        with open("secrets.json") as f:
+            secrets = json.load(f)
+    else:
+        print("Error: secrets.json file is required - see README.md")
+        raise FileNotFoundError("secrets.json not found")
     
     ssid = secrets["ssid"]
     password = secrets["password"]
     
     server = HTTPServer(ssid, password)
-    
-    """
-    uasyncio.create_task(server.start_server())
-    uasyncio.create_task(server.auto_update_time())
-    uasyncio.create_task(logging.write_memory_to_log(server))
-    uasyncio.create_task(brightness_control.handle_button())
-    uasyncio.create_task(sunrise_led.handle_button())
-    uasyncio.create_task(main_led.handle_button())
-    """
+
     uasyncio.create_task(log_exceptions(server.start_server(), server))
     uasyncio.create_task(log_exceptions(server.auto_update_time(), server))
     uasyncio.create_task(log_exceptions(logging.write_memory_to_log(server), server))
