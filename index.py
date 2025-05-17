@@ -2,7 +2,7 @@ def webpage(
     brightness: int,
     alarm_time: tuple[int, int],
     sunrise_led_mode: str,
-    # main_led_mode: str
+    main_led_mode: str
     ):
     """
     brightness: int, expecting 0-100
@@ -30,7 +30,7 @@ def webpage(
         # lowercase to Title
         sunrise_led_mode = f"{sunrise_led_mode[0].upper()}{sunrise_led_mode[1:]}"
     
-    # main_led_mode = f"{main_led_mode[0].upper()}{main_led_mode[1:]}"
+    main_led_mode = f"{main_led_mode[0].upper()}{main_led_mode[1:]}"
 
     # Build HTML
     html = f"""
@@ -103,14 +103,18 @@ def webpage(
                 <button type="button" class="pill-button {'selected' if sunrise_led_mode == 'Alarm' else ''}" onclick="selectPill('group1', this)">Alarm</button>
             </div>
             <input type="hidden" id="group1-selected" name="sunrise_led" value="{sunrise_led_mode}" />
+
+            <h4>Main LEDs</h4>
+            <div class="pill-button-group group2">
+                <button type="button" class="pill-button {'selected' if main_led_mode == 'Off' else ''}" onclick="selectPill('group2', this)">Off</button>
+                <button type="button" class="pill-button {'selected' if main_led_mode == 'White' else ''}" onclick="selectPill('group2', this)">White</button>
+                <button type="button" class="pill-button {'selected' if main_led_mode == 'Rainbow' else ''}" onclick="selectPill('group2', this)">Rainbow</button>
+            </div>
+            <input type="hidden" id="group2-selected" name="main_led" value="{main_led_mode}" />
             
             <br>            
             <button type="submit">Set</button>
             <br>
-        </form>
-        
-        <form action="/" method="POST">
-            <button name="time" value="settime">Set RTC</button>
         </form>
         
     </body>

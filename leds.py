@@ -474,15 +474,15 @@ class LEDController:
 sunrise_led = LEDController(
         leds_pin=4,
         mode_button_pin=12,
-        number_of_leds=12, 
+        number_of_leds=12,
         led_function="sunrise",
         led_type = "rgbw",
     )
 
-# main_led = LEDController(
-#         leds_pin=13,
-#         mode_button_pin=20,
-#         number_of_leds=36, 
-#         led_function="normal",
-#         led_type = "rgb",
-#     )
+main_led = LEDController(
+        leds_pin=22,
+        mode_button_pin=19,
+        number_of_leds=12, 
+        led_function="normal",
+        led_type = "rgb",
+    )
