@@ -13,6 +13,24 @@ async def log_exceptions(awaitable, s):
     except Exception as e:
         print(e)
         logging.write_to_log(s, e)
+
+
+def get_wifi_credentials() -> tuple[str, str]:
+
+    # Check if the file exists before opening
+    if "secrets.json" in os.listdir():
+        with open("secrets.json") as f:
+            secrets = json.load(f)
+    else:
+        raise FileNotFoundError("secrets.json file is required - see README.md")
+    
+    try:
+        ssid = secrets["ssid"]
+        password = secrets["password"]
+    except KeyError as e:
+        raise KeyError(f"Missing key {e} in secrets.json. Ensure 'ssid' and 'password' are present.")
+
+    return ssid, password
         
 
 async def main():
@@ -22,17 +40,7 @@ async def main():
     
     print("Running main")
 
-    # Check if the file exists before opening
-    if "secrets.json" in os.listdir():
-        with open("secrets.json") as f:
-            secrets = json.load(f)
-    else:
-        print("Error: secrets.json file is required - see README.md")
-        raise FileNotFoundError("secrets.json not found")
-    
-    ssid = secrets["ssid"]
-    password = secrets["password"]
-    
+    ssid, password = get_wifi_credentials()
     server = HTTPServer(ssid, password)
 
     uasyncio.create_task(log_exceptions(server.start_server(), server))
