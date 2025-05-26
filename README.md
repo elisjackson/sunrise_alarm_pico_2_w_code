@@ -1,7 +1,7 @@
 # Sunrise alarm clock
 
 This repo contains Micropython code written for use on a Raspberry Pi Pico 2 W.\
-See XXX for a more detailed project write up.
+See [elisjackson.github.io](https://elisjackson.github.io/projects/sunrise-alarm-clock/) for a more detailed project write up.
 
 The code:
 - handles the independent control of two LED strings. Lighting modes are defined (and can be modified or added to) `leds.py`
