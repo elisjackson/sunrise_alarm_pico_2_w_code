@@ -8,7 +8,7 @@ The code:
 - initialises a small HTTP server on the Pi Pico. Navigating to the server's IP address in a browser serves a webpage (defined in `index.html`) which allows control of the LED strings (setting the alarm time, setting lighting modes, and brightness settings).
 
 Other repositories associated with this project:
-- KiCAD PCB files: XXX
+- [KiCAD PCB files](https://github.com/elisjackson/sunrise_alarm_kicad)
 
 ## Pico setup
 
