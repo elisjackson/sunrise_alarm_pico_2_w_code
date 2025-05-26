@@ -467,26 +467,28 @@ class LEDController:
         return alarm_countown_seconds
     
     
-    async def alarm_mode(self, seconds_remaining: int):
-        
-        await uasyncio.sleep(seconds_remaining)
+    async def alarm_mode(self):
+        """
+        Gradually increase LED brightness, then gradually fade-out.
+        """
         
         print("Alarm on at", RTC().datetime())
         
         # all in seconds
         time_resolution = 0.1
+        # fade in from 0 to the desired end brightness over this many seconds
         fadein_duration = 20 * 60
+        # fade out over the duration of an hour
         fadeout_duration = 3600
         
         time_steps = int(fadein_duration / time_resolution)
         
-        # boost the brightness - TODO - keep or discard this?
-        # max_brightness = min(1.5 * self.brightness, 0.75)
-        max_brightness = brightness_control.brightness
-        print(max_brightness)
+        # ensure the brightness is at least 75%, as a very low brightness could be currently set.
+        max_brightness = min(self.brightness, 0.75)
         
         colour = (255, 255, 102)  # light yellow
         
+        # fade in
         step = 0
         while step < time_steps:
             brightness = (step / time_steps) * max_brightness
@@ -496,7 +498,7 @@ class LEDController:
             step += 1
             await uasyncio.sleep(time_resolution)
             
-        # fade out slowly
+        # fade out
         await self.fadeout_leds(fade_duration=fadeout_duration)
         self.turn_off()  # ensure all off at end
             
@@ -512,22 +514,29 @@ class LEDController:
         """
         
         self.turn_off()
+        # the timer periodically recalculates the remaining seconds,
+        # since the microcontroller's RTC gets updated periodically in the background.
+        # this ensures the remaining seconds to the desired alarm time remains accurate.
         timer_refresh_period = 3600
-        start_offset_seconds = 5 * 60
+        # offset time - the lights will start coming on this many seconds before the alarm time.
+        start_offset_seconds = 10 * 60
         
         # Display the alarm time
         await self.flash_alarm_time_indicator(self.alarm_time)
         
-        # initialize to enter while loop
-        seconds_remaining = timer_refresh_period + 1
-        
         while True:
+            # calculate seconds to alarm (offset seconds subtracted)
             seconds_remaining = self.get_seconds_to_alarm(self.alarm_time, start_offset_seconds)                
             print(f"Sleeping for {seconds_remaining} seconds")
-            if seconds_remaining > timer_refresh_period + start_offset_seconds:
+            if seconds_remaining > (timer_refresh_period + start_offset_seconds):
                 await uasyncio.sleep(timer_refresh_period)
             else:
-                await uasyncio.create_task(self.alarm_mode(seconds_remaining))
+                # sleep for the last batch of seconds
+                await uasyncio.sleep(seconds_remaining)
+                # start sunrise wake-up
+                await self.alarm_mode()
+                # finally, return back to top of while loop
+                # if no IRQs triggered, alarm will come on again the next day.
 
 
 sunrise_led = LEDController(
