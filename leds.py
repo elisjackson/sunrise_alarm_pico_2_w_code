@@ -156,6 +156,13 @@ class LEDController:
                 
                 
     def adjust_for_rgbw(self, col: list, off=False):
+        """
+        Adjust RGB input to RGBW, if the LEDs are of RGBW type.
+
+        Args:
+            col: list containing RGB values
+            off: boolean flag, indicating whether the LEDs should be "on" (in any mode) of "off"
+        """
         
         if type(col) != list:
             col = list(col)
@@ -170,11 +177,24 @@ class LEDController:
         
                 
     def adjust_brightness(self, col: list):
+        """
+        Adjusts the LED brightness according to the live current brightness setting.
+
+        Args:
+            col: list of RGB or RGBW values
+        """
         
         return [c * brightness_control.brightness for c in col]
     
     
     def write_all_leds(self, col: list):
+        """
+        Writes the same RGB/RGBW data to all LEDs in the string.
+
+        Args:
+            col: desired RGB/RGBW values for all LEDs.
+        """
+
         col = [int(c) for c in col]  # ensure all integers
         col = tuple(col)  # list to tuple
         for i in range(self.number_of_leds):
@@ -183,12 +203,21 @@ class LEDController:
                 
                 
     def turn_off(self):
+        """
+        Turn off all LEDs.
+        """
         col = [0, 0, 0]
         col = self.adjust_for_rgbw(col, off=True)
         self.write_all_leds(col)
         
         
-    async def turn_on(self, rgb: tuple = None):
+    async def turn_on(self, rgb: tuple=None):
+        """
+        Turn on all LEDs in the string to a steady colour. Defaults to white.
+
+        Args:
+            rgb: the desired rgb colour
+        """
         
         while True:
         
@@ -209,7 +238,7 @@ class LEDController:
         minor_time_steps: int
         ):
         """
-
+        TODO - docstring
         """
         
         # initialize generator & step forward
@@ -235,6 +264,9 @@ class LEDController:
         refresh_rate: float,
         cycle_period: float,
         ):
+        """
+        TODO - docstring
+        """
         
         # define rgb colours at 100% brightness
         RED = (255, 0, 0)
@@ -289,6 +321,9 @@ class LEDController:
     
         
     async def turn_on_rainbow(self):
+        """
+        TODO - docstring
+        """
         
         refresh_rate = 0.05  # seconds
         cycle_period = 5  # seconds from RED to PURPLE
@@ -319,14 +354,13 @@ class LEDController:
             
     async def fadeout_leds(self, fade_duration: float = 1):
         """
-        fade_duration: in seconds
+        Gradually fade out the LEDs to "off"
+
+        Args:
+            fade_duration: time taken to fade to off (seconds)
         """
         
         time_resolution = 0.01
-        total_time_steps = int(fade_duration / time_resolution)
-        delta_bightness_ratio = 1 / total_time_steps
-        
-        start_brightness = brightness_control.brightness
         
         # get the starting state
         start_rgb = []
@@ -355,6 +389,19 @@ class LEDController:
         time_type: str,  # "hour" or "minute"
         rgb: list[int]
         ):
+        """
+        Feedback the set alarm time hour or minute.
+
+        Lights the LEDs to the 'clock face' value corresponding to the hour/minute value passed.
+        Examples:
+        - flash_clock(3, "hour", [0, 0, 255]) -> light LEDs in blue from the 12 to the 3 o'clock positions
+        - flash_clock(25, "minute", [255, 0, 0]) -> light LEDs in red from the 12 to the 5 o'clock positions
+
+        Args:
+            value: hour or minute value
+            time_type: "hour" or "minute", used to apply correct conversion to the 'clock face' value
+            rgb: desired LED colour
+        """
         
         # adjust rgb input
         col = self.adjust_for_rgbw(rgb)
@@ -388,8 +435,12 @@ class LEDController:
         self.turn_off()        
             
             
-    async def flash_alarm_time_indicator(self, alarm_time: tuple):
+    async def flash_alarm_time_indicator(self, alarm_time: tuple[int, int]):
         """
+        Show the set alarm hour and minute via the LEDs.
+
+        Args:
+            alarm_time: tuple containing alarm time hour and minute.
         """
         await self.flash_clock(alarm_time[0], "hour", [255, 150, 0])
         await self.flash_clock(alarm_time[1], "minute", [0, 0, 255])
@@ -451,6 +502,14 @@ class LEDController:
             
             
     async def turn_on_sunrise_mode(self):
+        """
+        Handle LED when sunrise mode is selected.
+
+        1. Turn off LEDs (assuming they may already be lit)
+        2. Feedback the current alarm time
+        3. Calculate time to wait, and sleep for desired amount of time
+        4. Execute the sunrise wake-up coroutine
+        """
         
         self.turn_off()
         timer_refresh_period = 3600
